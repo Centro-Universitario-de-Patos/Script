@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  
+<form action="{% url 'converter' %}" enctype="multipart/form-data" method="post"   >
+    {% csrf_token %}
+    <input type="file" name="file" >
+    <button type="submit"> upload</button> 
+</form>
+<a href="{% url 'export_csv' %}">Export CSV</a>
+{% endblock content %}
