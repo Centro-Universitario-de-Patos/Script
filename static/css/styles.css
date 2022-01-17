@@ -1,0 +1,19 @@
+.top-content{
+    background-color: #f6f0e9;
+    padding: 60px 0 40px;
+}
+
+.container {
+    padding: 0 20px;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+h1{
+    margin: 0 0 33px;
+    word-break: break-word;
+}
+
+.text-center {
+    text-align: center;
+}
