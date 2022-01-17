@@ -13,16 +13,27 @@ def converter(request):
         moodle_resource = MoodleResource()
         dataset = Dataset()
         new_arquivo = request.FILES['file']
+        nome_disciplina = request.POST['nome-disciplina']
         imported_data = dataset.load(new_arquivo.read(), format = 'xlsx')
         for data in imported_data:
+            nome_e_sobrenome = data[1].split(' ')
+            nome = data[1].split(' ')[0]
+            sobrenome = str(data[1].split(' ')[1:])
+            sobrenome = sobrenome.replace(',', ' ')
+            sobrenome = sobrenome.replace('[', '')
+            sobrenome = sobrenome.replace(']', '')
+            sobrenome = sobrenome.replace("'", '')
+            primeiro_nome = str([data[1].split(None,1)[0]])[2:-2]
             
             value = Moodle(
-                username = data[0],
-                password = data[1],
-                firstname = data[2],
-                lastname = data[0],
-                email = data[1],
-                course1 = data[2],
+                
+                username = data[2],
+                password = 'changeme',
+            
+                firstname = nome,
+                lastname = sobrenome,
+                email = data[2],
+                course1 = nome_disciplina,
             )
             value.save()
         return render(request, 'conversor/converter.html')

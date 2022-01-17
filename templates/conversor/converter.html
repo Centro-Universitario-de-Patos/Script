@@ -5,6 +5,7 @@
   
 <form action="{% url 'converter' %}" enctype="multipart/form-data" method="post"   >
     {% csrf_token %}
+    <input type="text" name="nome-disciplina" id="">
     <input type="file" name="file" >
     <button type="submit"> upload</button> 
 </form>
