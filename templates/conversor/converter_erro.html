@@ -12,7 +12,9 @@
         <div class="container">
             <h1 class="text-center">Conversor de Script</h1>
         </div>
-
+        <div>
+            <h3 style="color: red;">Ops arquivo não confere</h3>
+        </div>
         <div class="orange-wave-back">
             <form action="{% url 'converter' %}" enctype="multipart/form-data" method="post">
                 {% csrf_token %}
