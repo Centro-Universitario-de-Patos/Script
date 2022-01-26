@@ -12,9 +12,26 @@ import csv
 import requests
 
 def converter(request):
-    print(request.method)
+
     dados = {
         'conteudo_disciplina_jsons': retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json'),
+    }
+    li = []
+    for dt in dados['conteudo_disciplina_jsons']:
+        for d in dt:
+            dd = dt[d]
+            matriz = dt['matriz']
+            li.append(matriz)
+
+    lista = remove_repetidos(li)
+    print(lista)
+    print(lista)
+    print(lista)
+    print(lista)
+    dados = {
+        'conteudo_disciplina_jsons': retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json'),
+        'lista': lista,
+        'curso':''
     }
     if request.method == 'POST':
         moodle = Moodle.objects.all()
@@ -75,21 +92,22 @@ def converter(request):
         return render(request, 'conversor/converter.html', dados)
     
 def export_csv(request):
+    conteudo_disciplina_jsons = retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json'),
     dados = {
-        'conteudo_disciplina_jsons': retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json'),
+        'conteudo_disciplina_jsons':conteudo_disciplina_jsons,
     }
     try:        
         moodles = Moodle.objects.all()
         nome = moodles[0].course1
-        print(nome)
+        nome_formatado = nome[(nome.find('-')+1):]
         response = HttpResponse(content_type = 'text/csv')
 
-        response['Content-Disposition'] = 'attachment; filename=' + nome + '.csv'
+        response['Content-Disposition'] = 'attachment; filename=' + nome_formatado   + '.csv'
         writer = csv.writer(response)
         writer.writerow(['username', 'password','firstname', 'lastname','email', 'course1'])
-        
         for moodle in moodles:
-            writer.writerow([moodle.username, moodle.password, moodle.firstname, moodle.lastname, moodle.email, moodle.course1])
+            codigo = moodle.course1[0:(moodle.course1.find('-')-1)]
+            writer.writerow([moodle.username, moodle.password, moodle.firstname, moodle.lastname, moodle.email, codigo])
             moodle.delete()
         return response
     except:
@@ -100,4 +118,55 @@ def retorna_api(url):
     conteudo = requests.get(url)
     conteudo_json = conteudo.json()
     return conteudo_json
+
+def retorna_curso(request):
+    dados = {
+        'conteudo_disciplina_jsons': retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json'),
+    
+    }
+
+    li = []
+    for dt in dados['conteudo_disciplina_jsons']:
+        for d in dt:
+            dd = dt[d]
+            matriz = dt['matriz']
+            li.append(matriz)
+
+    lista = remove_repetidos(li)
+
+
+    if request.method == "POST":
+
+        curso = request.POST['curso']
+        if curso == 'Serviço Social':
+            curso = 'SS2018.1'
+        print(curso)
+        l = []
+        # print(dados['conteudo_disciplina_jsons'][0]['tipo'])
+        for dt in dados['conteudo_disciplina_jsons']:
+            for d in dt:
+                dd = dt[d]
+
+                if dd == curso:
+                    nome_disciplina = dt['nome_disciplina']
+                    matricula = dt['matricula']
+                    dis_formatada = f'{matricula} - {nome_disciplina}'
+                    l.append(dis_formatada)
+    print(l)
+
+    data = { 
+        'curso': curso,
+        'l' : l,
+        'lista': lista,
+    }
+    return render(request, 'conversor/converter.html', data)
+
+
+def remove_repetidos(lista):
+    l = []
+    for i in lista:
+        if i not in l:
+            l.append(i)
+    l.sort()
+    return l
 

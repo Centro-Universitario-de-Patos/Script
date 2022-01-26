@@ -18,24 +18,50 @@
 
         </div>
         <div class="orange-wave-back">
+            <form method="post" action="{% url 'curso' %}" id="form-curso" >
+                {% csrf_token %}
+            
+                <Label>Selecione o Curso</Label>
+                    <div>
+                    <input list="curso_nome" id="curso" value="{{curso}}" required name="curso">
+                        <datalist id="curso_nome">
+                        <option value="Escolha Uma Disciplina">Escolha Uma Disciplina</option>
+                            {%for conteudo_disciplina_json in lista%}
+                           
+                                {% if conteudo_disciplina_json == "SS2018.1" %}
+                                <option
+                                    value="Serviço Social">
+                                    Serviço Social
+                                </option>
+                                {% else %}
+                                <option
+                                    value="{{conteudo_disciplina_json}}">
+                                    {{conteudo_disciplina_json}}
+                                </option>
+                                {% endif %}
+                               
+                            {% endfor %}
+                        </datalist>
+                    </div>
+            </form>
+
             <form action="{% url 'converter' %}" enctype="multipart/form-data" method="post">
                 {% csrf_token %}
-                <div>
                     <Label>Nome da disciplina</Label>
                     <div>
-                        <select required name="nome-disciplina">
-                            <option value="default">Escolha Uma Disciplina</option>
-                            {%for conteudo_disciplina_json in conteudo_disciplina_jsons%}
+                    <input list="disciplina" id="disc" required name="nome-disciplina">
+                        <datalist id="disciplina">
+                        <option value="Escolha Uma Disciplina">Escolha Uma Disciplina</option>
+                            {%for conteudo_disciplina_json in l%}
                             <option
-                                value="{{conteudo_disciplina_json.matricula}} - {{conteudo_disciplina_json.nome_disciplina}} - {{conteudo_disciplina_json.ch}}h - {{conteudo_disciplina_json.credito}} Cred">
-                                {{conteudo_disciplina_json.matricula}} - {{conteudo_disciplina_json.nome_disciplina}} -
-                                {{conteudo_disciplina_json.ch}}h - {{conteudo_disciplina_json.credito}} Cred
+                                value="{{conteudo_disciplina_json}}">
+                                {{conteudo_disciplina_json}}
                             </option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <!-- <label for="course1">Escreva o nome da disciplina</label>
-                <input type="text" name="nome-disciplina" id="" placeholder="Digite aqui nome da disciplina" required> -->
+                    <input type="text" name="nome-disciplina" id="" placeholder="Digite aqui nome da disciplina" required> -->
                     <div>
                         <label for="upload">Busque o arquivo</label>
                         <p><input type="file" name="file" id=""></p>
@@ -45,4 +71,6 @@
             <a href="{% url 'export_csv' %}">Baixar</a>
         </div>
     </section>
+    <script src="{% static 'js/curso.js' %}"></script>
+
     {% endblock content %}
