@@ -17,6 +17,7 @@ h1{
 .text-center {
     text-align: center;
 }
+<<<<<<< HEAD
 
 .orange-wave-back{
     margin: 0 auto;
@@ -121,3 +122,8 @@ button, input, textarea, select{
     transition: background-color .25s ease;
 }
 
+=======
+#disc{
+    width: 50%;
+}
+>>>>>>> d8ade244ea2a1fd64a09a32c58497be196e56d44

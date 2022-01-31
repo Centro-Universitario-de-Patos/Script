@@ -12,7 +12,9 @@
         <div class="container">
             <h1 class="text-center">Conversor de Script</h1>
         </div>
-
+        <div>
+            <h3 style="color: red;">Ops arquivo não confere</h3>
+        </div>
         <div class="orange-wave-back">
             <form method="post" action="{% url 'curso' %}" id="form-curso" >
                 {% csrf_token %}
@@ -68,4 +70,5 @@
         </div>
     </section>
     <script src="{% static 'js/curso.js' %}"></script>
+
     {% endblock content %}

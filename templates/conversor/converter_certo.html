@@ -12,7 +12,11 @@
         <div class="container">
             <h1 class="text-center">Conversor de Script</h1>
         </div>
+        <div>
+            <h3 style="color: green;">Arquivo Convertido com Sucesso</h3>
+            <h4 style="color: green;">Clique em Baixar para fazer dowloard do arquivo</h4>
 
+        </div>
         <div class="orange-wave-back">
             <form method="post" action="{% url 'curso' %}" id="form-curso" >
                 {% csrf_token %}
@@ -68,4 +72,5 @@
         </div>
     </section>
     <script src="{% static 'js/curso.js' %}"></script>
+
     {% endblock content %}
