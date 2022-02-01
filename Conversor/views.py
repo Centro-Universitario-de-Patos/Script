@@ -1,6 +1,7 @@
 from ast import Try
 from asyncore import write
 from datetime import datetime
+
 from email.policy import default
 from django.shortcuts import render
 from .models import Moodle
@@ -10,6 +11,7 @@ from tablib import Dataset
 from django.http import HttpResponse
 import csv
 import requests
+import datetime
 
 def converter(request):
 
@@ -24,11 +26,9 @@ def converter(request):
             li.append(matriz)
 
     lista = remove_repetidos(li)
-    print(lista)
-    print(lista)
-    print(lista)
-    print(lista)
+    semestre = data_atual()
     dados = {
+        'semestre':semestre,
         'conteudo_disciplina_jsons': retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json'),
         'lista': lista,
         'curso':''
@@ -96,13 +96,20 @@ def export_csv(request):
     dados = {
         'conteudo_disciplina_jsons':conteudo_disciplina_jsons,
     }
-    try:        
-        moodles = Moodle.objects.all()
-        nome = moodles[0].course1
-        nome_formatado = nome[(nome.find('-')+1):]
-        response = HttpResponse(content_type = 'text/csv')
+    moodles = Moodle.objects.all()
+    nome = moodles[0].course1
+    nome_formatado = nome[(nome.find('-')+1):]
+    response = HttpResponse(content_type = 'text/csv')
 
-        response['Content-Disposition'] = 'attachment; filename=' + nome_formatado   + '.csv'
+    data_e_hora_atuais = datetime.datetime.now()
+
+    print(nome_formatado)
+    try:        
+
+        data = str(data_e_hora_atuais.strftime('%d/%m/%Y %H:%M'))
+        
+        print(data)
+        response['Content-Disposition'] = 'attachment; filename=' + nome_formatado +'_' + data + '.csv'
         writer = csv.writer(response)
         writer.writerow(['username', 'password','firstname', 'lastname','email', 'course1'])
         for moodle in moodles:
@@ -120,7 +127,9 @@ def retorna_api(url):
     return conteudo_json
 
 def retorna_curso(request):
+    semestre = data_atual()
     dados = {
+        
         'conteudo_disciplina_jsons': retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json'),
     
     }
@@ -147,7 +156,7 @@ def retorna_curso(request):
             for d in dt:
                 dd = dt[d]
 
-                if dd == curso:
+                if str(dd).title() == curso.title():
                     nome_disciplina = dt['nome_disciplina']
                     matricula = dt['matricula']
                     dis_formatada = f'{matricula} - {nome_disciplina}'
@@ -155,6 +164,7 @@ def retorna_curso(request):
     print(l)
 
     data = { 
+        'semestre':semestre,
         'curso': curso,
         'l' : l,
         'lista': lista,
@@ -170,3 +180,15 @@ def remove_repetidos(lista):
     l.sort()
     return l
 
+def data_atual():
+    data = datetime.date.today()
+    ano = data.strftime("%Y")
+    mes = data.strftime("%m")
+    if int(mes) > 6:
+        semestre = 2
+    else:
+        semestre = 1
+    
+    return f'{ano[2:]}.{semestre}'
+
+    

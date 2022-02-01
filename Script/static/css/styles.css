@@ -17,7 +17,6 @@ h1{
 .text-center {
     text-align: center;
 }
-<<<<<<< HEAD
 
 .orange-wave-back{
     margin: 0 auto;
@@ -122,8 +121,30 @@ button, input, textarea, select{
     transition: background-color .25s ease;
 }
 
-=======
 #disc{
     width: 50%;
+    border: 1px solid black;
+    border-radius: 5px;
+    height: 10px;
 }
->>>>>>> d8ade244ea2a1fd64a09a32c58497be196e56d44
+
+#bt-conv{
+    padding: 5px;
+    border: 1px solid black;
+    border-radius: 5px;    
+    margin-bottom: 10px;
+
+}
+
+#baixar{
+    margin-top: 10px;
+    padding: 5px;
+    border: 1px solid black;
+    border-radius: 5px;
+
+}
+#curso{
+    border: 1px solid black;
+    border-radius: 5px;
+
+}
