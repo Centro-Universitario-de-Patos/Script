@@ -16,7 +16,7 @@ import datetime
 def converter(request):
 
     dados = {
-        'conteudo_disciplina_jsons': retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json'),
+        'conteudo_disciplina_jsons': retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json'),
     }
     li = []
     for dt in dados['conteudo_disciplina_jsons']:
@@ -29,7 +29,7 @@ def converter(request):
     semestre = data_atual()
     dados = {
         'semestre':semestre,
-        'conteudo_disciplina_jsons': retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json'),
+        'conteudo_disciplina_jsons': retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json'),
         'lista': lista,
         'curso':''
     }
@@ -52,7 +52,7 @@ def converter(request):
 
         try:
             imported_data = dataset.load(new_arquivo.read(), format = 'xlsx')
-            api_disciplinas = retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json')        
+            api_disciplinas = retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json')        
         except:
             return render(request, 'conversor/converter_erro.html', dados)
  
@@ -92,7 +92,7 @@ def converter(request):
         return render(request, 'conversor/converter.html', dados)
     
 def export_csv(request):
-    conteudo_disciplina_jsons = retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json'),
+    conteudo_disciplina_jsons = retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json'),
     dados = {
         'conteudo_disciplina_jsons':conteudo_disciplina_jsons,
     }
@@ -130,7 +130,7 @@ def retorna_curso(request):
     semestre = data_atual()
     dados = {
         
-        'conteudo_disciplina_jsons': retorna_api('https://glacial-oasis-62433.herokuapp.com/disciplina/?format=json'),
+        'conteudo_disciplina_jsons': retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json'),
     
     }
 
