@@ -40,6 +40,18 @@ def converter(request):
 
         try:
             new_arquivo = request.FILES['file']
+            a = str(new_arquivo)
+            print(new_arquivo)
+            print(a[-3:])
+            print('')
+            print('')
+            print('')
+            print('')
+            print('')
+            print('')
+            print('')
+            print('')
+            print('')
         except:
             return render(request, 'conversor/converter_erro.html', dados)
             
@@ -50,11 +62,27 @@ def converter(request):
             return render(request, 'conversor/converter_erro.html', dados)
 
 
-        try:
-            imported_data = dataset.load(new_arquivo.read(), format = 'xlsx')
-            api_disciplinas = retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json')        
-        except:
+        if a[-3:] == "lsx":
+            try:
+                imported_data = dataset.load(new_arquivo.read(), format = 'xlsx')
+            except:
+                return render(request, 'conversor/converter_erro.html', dados)
+
+        elif a[-3:] == 'xls':
+            try:
+                imported_data = dataset.load(new_arquivo.read(), format = 'xls')
+            except:
+                return render(request, 'conversor/converter_erro.html', dados)
+        else:
             return render(request, 'conversor/converter_erro.html', dados)
+
+        # try:
+        #     imported_data = dataset.load(new_arquivo.read(), format = 'xls')
+        #     api_disciplinas = retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json')        
+        # except :
+        #     return render(request, 'conversor/converter_erro.html', dados)
+ 
+
  
         print(nome_disciplina)
 
@@ -98,7 +126,7 @@ def export_csv(request):
     }
     moodles = Moodle.objects.all()
     nome = moodles[0].course1
-    nome_formatado = nome[(nome.find('-')+1):]
+    nome_formatado = nome[(nome.find('-')+1):-4]
     response = HttpResponse(content_type = 'text/csv')
 
     data_e_hora_atuais = datetime.datetime.now()
@@ -148,7 +176,7 @@ def retorna_curso(request):
 
         curso = request.POST['curso']
         if curso == 'Serviço Social':
-            curso = 'SS2018.1'
+            curso = 'SERVIÇO SOCIAL'
         print(curso)
         l = []
         # print(dados['conteudo_disciplina_jsons'][0]['tipo'])
