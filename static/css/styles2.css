@@ -121,30 +121,3 @@ button, input, textarea, select{
     transition: background-color .25s ease;
 }
 
-#disc{
-    width: 50%;
-    border: 1px solid black;
-    border-radius: 5px;
-    height: 10px;
-}
-
-#bt-conv{
-    padding: 5px;
-    border: 1px solid black;
-    border-radius: 5px;    
-    margin-bottom: 10px;
-
-}
-
-#baixar{
-    margin-top: 10px;
-    padding: 5px;
-    border: 1px solid black;
-    border-radius: 5px;
-
-}
-#curso{
-    border: 1px solid black;
-    border-radius: 5px;
-
-}
