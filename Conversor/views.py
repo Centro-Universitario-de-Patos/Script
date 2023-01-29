@@ -14,9 +14,8 @@ import requests
 import datetime
 
 def converter(request):
-
     dados = {
-        'conteudo_disciplina_jsons': retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json'),
+        'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
     }
     li = []
     for dt in dados['conteudo_disciplina_jsons']:
@@ -27,9 +26,10 @@ def converter(request):
 
     lista = remove_repetidos(li)
     semestre = data_atual()
+    
     dados = {
         'semestre':semestre,
-        'conteudo_disciplina_jsons': retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json'),
+        'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
         'lista': lista,
         'curso':''
     }
@@ -41,17 +41,7 @@ def converter(request):
         try:
             new_arquivo = request.FILES['file']
             a = str(new_arquivo)
-            print(new_arquivo)
-            print(a[-3:])
-            print('')
-            print('')
-            print('')
-            print('')
-            print('')
-            print('')
-            print('')
-            print('')
-            print('')
+
         except:
             return render(request, 'conversor/converter_erro.html', dados)
             
@@ -78,13 +68,12 @@ def converter(request):
 
         # try:
         #     imported_data = dataset.load(new_arquivo.read(), format = 'xls')
-        #     api_disciplinas = retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json')        
+        #     api_disciplinas = retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json')        
         # except :
         #     return render(request, 'conversor/converter_erro.html', dados)
  
 
  
-        print(nome_disciplina)
 
         
 
@@ -120,7 +109,8 @@ def converter(request):
         return render(request, 'conversor/converter.html', dados)
     
 def export_csv(request):
-    conteudo_disciplina_jsons = retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json'),
+
+    conteudo_disciplina_jsons = retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
     dados = {
         'conteudo_disciplina_jsons':conteudo_disciplina_jsons,
     }
@@ -131,12 +121,10 @@ def export_csv(request):
 
     data_e_hora_atuais = datetime.datetime.now()
 
-    print(nome_formatado)
     try:        
 
         data = str(data_e_hora_atuais.strftime('%d/%m/%Y %H:%M'))
         
-        print(data)
         response['Content-Disposition'] = 'attachment; filename=' + nome_formatado +'_' + data + '.csv'
         writer = csv.writer(response)
         writer.writerow(['username', 'password','firstname', 'lastname','email', 'course1'])
@@ -155,10 +143,11 @@ def retorna_api(url):
     return conteudo_json
 
 def retorna_curso(request):
+
     semestre = data_atual()
     dados = {
         
-        'conteudo_disciplina_jsons': retorna_api('https://apidisfip.herokuapp.com/disciplina/?format=json'),
+        'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
     
     }
 
@@ -177,9 +166,7 @@ def retorna_curso(request):
         curso = request.POST['curso']
         if curso == 'Serviço Social':
             curso = 'SERVIÇO SOCIAL'
-        print(curso)
         l = []
-        # print(dados['conteudo_disciplina_jsons'][0]['tipo'])
         for dt in dados['conteudo_disciplina_jsons']:
             for d in dt:
                 dd = dt[d]
@@ -187,10 +174,11 @@ def retorna_curso(request):
                 if str(dd).title() == curso.title():
                     nome_disciplina = dt['nome_disciplina']
                     matricula = dt['matricula']
-                    dis_formatada = f'{matricula} - {nome_disciplina}'
-                    l.append(dis_formatada)
-    print(l)
+                    if matricula[-4:] == str(semestre):
+                        dis_formatada = f'{matricula} - {nome_disciplina}'
+                        l.append(dis_formatada)
 
+    print(l)
     data = { 
         'semestre':semestre,
         'curso': curso,
