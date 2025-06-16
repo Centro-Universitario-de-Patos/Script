@@ -78,26 +78,26 @@ WSGI_APPLICATION = 'Script.wsgi.application'
 
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "geradordescript",
-        "USER": "gerenciati",
-        "PASSWORD": "@Devcead2022",
-        "HOST": '',
-        "PORT": '',
-    }
-}
-
-
-
-
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "geradordescript",
+#         "USER": "gerenciati",
+#         "PASSWORD": "@Devcead2022",
+#         "HOST": '',
+#         "PORT": '',
+#     }
 # }
+
+
+
+
+DATABASES = {
+   'default': {
+       'ENGINE': 'django.db.backends.sqlite3',
+       'NAME': BASE_DIR / 'db.sqlite3',
+   }
+}
 
 
 # Password validation
@@ -123,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'pt-br'
- 
+
 TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
@@ -136,12 +136,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_ROOT = '/home/gerenciati/apps/geradordescriptstatic'
+# STATIC_ROOT = '/home/gerenciati/apps/geradordescriptstatic'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
- 
- 
+
+
+# STATICFILES_DIRS = [
+#    '/home/gerenciati/apps/geradordescript/Script/static'
+# ]
 STATICFILES_DIRS = [
-   '/home/gerenciati/apps/geradordescript/Script/static'
+    os.path.join(BASE_DIR, 'Script/static')
 ]
 #Midia carregadas para o sistema
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

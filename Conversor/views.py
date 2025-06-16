@@ -13,26 +13,62 @@ import csv
 import requests
 import datetime
 
-def converter(request):
-    dados = {
-        'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
-    }
-    li = []
-    for dt in dados['conteudo_disciplina_jsons']:
-        for d in dt:
-            dd = dt[d]
-            matriz = dt['matriz']
-            li.append(matriz)
 
-    lista = remove_repetidos(li)
+def converter(request):
+
+    # dados = {
+    #     'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
+    # }
+    # li = []
+    # for dt in dados['conteudo_disciplina_jsons']:
+    #     for d in dt:
+    #         dd = dt[d]
+    #         matriz = dt['matriz']
+    #         li.append(matriz)
+
+    # lista = remove_repetidos(li)
+    # semestre = data_atual()
+
+    # dados = {
+    #     'semestre':semestre,
+    #     'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
+    #     'lista': lista,
+    #     'curso':''
+    # }
+
     semestre = data_atual()
-    
+
+    url = "http://0.0.0.0:8001/api/v1/disciplina/oferta/"
+
+    response = requests.get(url)
+
+    lista_cursos, lista_curso_disciplinas = [], []
+
+    for informacoes_do_curso in response.json():
+
+        situacao_do_curso = informacoes_do_curso['disciplina_matriz_curricular']['matriz_curricular']['curso']['ativo']
+
+        if situacao_do_curso == True:
+
+            nome_do_curso = informacoes_do_curso['disciplina_matriz_curricular']['matriz_curricular']['curso']['nome_curso']
+            nome_da_disciplina = informacoes_do_curso['disciplina_matriz_curricular']['disciplina']['nome']
+            matricula_da_disciplina = informacoes_do_curso['disciplina_matriz_curricular']['disciplina']['codigo']
+
+            if nome_do_curso not in lista_cursos:
+                lista_cursos.append(nome_do_curso)
+
+            lista_curso_disciplinas.append((nome_do_curso, f'{nome_da_disciplina} - {matricula_da_disciplina}'))
+
+    lista = lista_cursos
+    semestre = data_atual()
+
     dados = {
         'semestre':semestre,
-        'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
+        'conteudo_disciplina_jsons': response.json(),
         'lista': lista,
         'curso':''
     }
+
     if request.method == 'POST':
         moodle = Moodle.objects.all()
         moodle_resource = MoodleResource()
@@ -44,7 +80,7 @@ def converter(request):
 
         except:
             return render(request, 'conversor/converter_erro.html', dados)
-            
+
         nome_disciplina = request.POST['nome-disciplina']
 
         if nome_disciplina == "Escolha Uma Disciplina" or nome_disciplina == 'default':
@@ -68,14 +104,9 @@ def converter(request):
 
         # try:
         #     imported_data = dataset.load(new_arquivo.read(), format = 'xls')
-        #     api_disciplinas = retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json')        
+        #     api_disciplinas = retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json')
         # except :
         #     return render(request, 'conversor/converter_erro.html', dados)
- 
-
- 
-
-        
 
         for data in imported_data:
             nome_e_sobrenome = data[1].split(' ')
@@ -86,7 +117,7 @@ def converter(request):
             sobrenome = sobrenome.replace(']', '')
             sobrenome = sobrenome.replace("'", '')
             primeiro_nome = str([data[1].split(None,1)[0]])[2:-2]
-            
+
             value = Moodle(
                 username = data[2],
                 password = 'changeme',
@@ -102,12 +133,13 @@ def converter(request):
             else:
                 cadastrado = Moodle.objects.filter(username=data[2])
                 if cadastrado == 0:
-                    value.save() 
+                    value.save()
         return render(request, 'conversor/converter_certo.html', dados)
 
     else:
         return render(request, 'conversor/converter.html', dados)
-    
+
+
 def export_csv(request):
 
     conteudo_disciplina_jsons = retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
@@ -121,10 +153,10 @@ def export_csv(request):
 
     data_e_hora_atuais = datetime.datetime.now()
 
-    try:        
+    try:
 
         data = str(data_e_hora_atuais.strftime('%d/%m/%Y %H:%M'))
-        
+
         response['Content-Disposition'] = 'attachment; filename=' + nome_formatado +'_' + data + '.csv'
         writer = csv.writer(response)
         writer.writerow(['username', 'password','firstname', 'lastname','email', 'course1'])
@@ -135,55 +167,93 @@ def export_csv(request):
         return response
     except:
         return render(request, 'conversor/converter_erro.html', dados)
-    
+
 
 def retorna_api(url):
     conteudo = requests.get(url)
     conteudo_json = conteudo.json()
     return conteudo_json
 
+
 def retorna_curso(request):
 
+    # semestre = data_atual()
+    # dados = {
+
+    #     'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
+
+    # }
+
+    # li = []
+    # for dt in dados['conteudo_disciplina_jsons']:
+    #     for d in dt:
+    #         dd = dt[d]
+    #         matriz = dt['matriz']
+    #         li.append(matriz)
+
+    # lista = remove_repetidos(li)
+
+    # if request.method == "POST":
+
+    #     curso = request.POST['curso']
+    #     if curso == 'Serviço Social':
+    #         curso = 'SERVIÇO SOCIAL'
+    #     l = []
+    #     for dt in dados['conteudo_disciplina_jsons']:
+    #         for d in dt:
+    #             dd = dt[d]
+
+    #             if str(dd).title() == curso.title():
+    #                 nome_disciplina = dt['nome_disciplina']
+    #                 matricula = dt['matricula']
+    #                 if matricula[-4:] == str(semestre):
+    #                     dis_formatada = f'{matricula} - {nome_disciplina}'
+    #                     l.append(dis_formatada)
+
+    # data = {
+    #     'semestre':semestre,
+    #     'curso': curso,
+    #     'l' : l,
+    #     'lista': lista,
+    # }
+    # return render(request, 'conversor/converter.html', data)
+
     semestre = data_atual()
-    dados = {
-        
-        'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
-    
-    }
 
-    li = []
-    for dt in dados['conteudo_disciplina_jsons']:
-        for d in dt:
-            dd = dt[d]
-            matriz = dt['matriz']
-            li.append(matriz)
+    url = "http://0.0.0.0:8001/api/v1/disciplina/oferta/"
 
-    lista = remove_repetidos(li)
+    response = requests.get(url)
 
+    lista_cursos, lista_curso_disciplinas = [], []
+
+    for informacoes_do_curso in response.json():
+
+        situacao_do_curso = informacoes_do_curso['disciplina_matriz_curricular']['matriz_curricular']['curso']['ativo']
+
+        if situacao_do_curso == True:
+
+            nome_do_curso = informacoes_do_curso['disciplina_matriz_curricular']['matriz_curricular']['curso']['nome_curso']
+            nome_da_disciplina = informacoes_do_curso['disciplina_matriz_curricular']['disciplina']['nome']
+            matricula_da_disciplina = informacoes_do_curso['disciplina_matriz_curricular']['disciplina']['codigo']
+
+            if nome_do_curso not in lista_cursos:
+                lista_cursos.append(nome_do_curso)
+
+            lista_curso_disciplinas.append((nome_do_curso, f'{nome_da_disciplina} - {matricula_da_disciplina}'))
 
     if request.method == "POST":
+        curso_escolhido, lista_disciplinas = request.POST['curso'], []
 
-        curso = request.POST['curso']
-        if curso == 'Serviço Social':
-            curso = 'SERVIÇO SOCIAL'
-        l = []
-        for dt in dados['conteudo_disciplina_jsons']:
-            for d in dt:
-                dd = dt[d]
+        for curso in lista_curso_disciplinas:
 
-                if str(dd).title() == curso.title():
-                    nome_disciplina = dt['nome_disciplina']
-                    matricula = dt['matricula']
-                    if matricula[-4:] == str(semestre):
-                        dis_formatada = f'{matricula} - {nome_disciplina}'
-                        l.append(dis_formatada)
+            if curso_escolhido.upper() == curso[0].upper():
+                lista_disciplinas.append(curso[1])
 
-    print(l)
-    data = { 
+    data = {
         'semestre':semestre,
-        'curso': curso,
-        'l' : l,
-        'lista': lista,
+        'curso': curso_escolhido,
+        'l' : lista_disciplinas,
+        'lista': lista_cursos,
     }
     return render(request, 'conversor/converter.html', data)
 
@@ -196,6 +266,7 @@ def remove_repetidos(lista):
     l.sort()
     return l
 
+
 def data_atual():
     data = datetime.date.today()
     ano = data.strftime("%Y")
@@ -204,7 +275,5 @@ def data_atual():
         semestre = 2
     else:
         semestre = 1
-    
-    return f'{ano[2:]}.{semestre}'
 
-    
+    return f'{ano[2:]}.{semestre}'

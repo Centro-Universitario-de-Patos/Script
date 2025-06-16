@@ -4,73 +4,88 @@
 
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
-</head>
+<section class="py-5 bg-light">
+    <div class="container">
+        <h1 class="text-center mb-5">Conversor de Script</h1>
 
-<body>
-    <section class="top-content">
-
-        <div class="container">
-            <h1 class="text-center">Conversor de Script</h1>
-        </div>
-       
-        <div class="orange-wave-back">
-            <div class="orange-wave">
-                <div class="wave-inner">
-                    <div>
-                        <h3 style="color: green;">Arquivo Convertido com Sucesso</h3>
-                        <h4 style="color: green;">Clique em Baixar para fazer dowloard do arquivo</h4>
-            
-                    </div>
-                    <form method="post" action="{% url 'curso' %}" id="form-curso" class="convert-form convert-step is-active" autocomplete="off">
-                        {% csrf_token %}
-
-                        <Label>Selecione o Curso</Label>
-                        <div>
-                            <input list="curso_nome" id="curso" value="{{curso}}" required name="curso">
-                            <datalist id="curso_nome">
-                                <option value="Escolha Uma Disciplina">Escolha Uma Disciplina</option>
-                                {%for conteudo_disciplina_json in lista%}
-
-                                {% if conteudo_disciplina_json == "SS2018.1" %}
-                                
-                                {% else %}
-                                <option value="{{conteudo_disciplina_json|title}}">
-                                    {{conteudo_disciplina_json|title}}
-                                </option>
-                                {% endif %}
-
-                                {% endfor %}
-                            </datalist>
-                        </div>
-                    </form>
-
-                    <form action="{% url 'converter' %}" enctype="multipart/form-data" method="post" class="convert-form convert-step is-active" autocomplete="off">
-                        {% csrf_token %}
-                        <Label>Nome da disciplina</Label>
-                        <div>
-                            <input list="disciplina" id="disc" class="convert-url" required name="nome-disciplina">
-                            <datalist id="disciplina">
-                                <option value="Escolha Uma Disciplina">Escolha Uma Disciplina</option>
-                                {%for conteudo_disciplina_json in l%}
-                                <option value="{{conteudo_disciplina_json}} {{semestre}}">
-                                    {{conteudo_disciplina_json}} {{semestre}}
-                                </option>
-                                {% endfor %}
-                            </datalist>
-                        </div>
-                        <!-- <label for="course1">Escreva o nome da disciplina</label>
-                    <input type="text" name="nome-disciplina" id="" placeholder="Digite aqui nome da disciplina" required> -->
-                        <div>
-                            <label for="upload">Busque o arquivo</label>
-                            <p><input type="file" name="file" id=""></p>
-                        </div>
-                        <button type="submit" id="bt-conv"> Converter  </button>
-                    </form>
-                    <a id="baixar" href="{% url 'export_csv' %}">Baixar</a>
+        <!-- Mensagem de sucesso -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-8">
+                <div class="alert alert-success text-center" role="alert">
+                    <strong>Sucesso!</strong> <br> O arquivo foi convertido, clique em Baixar CSV para fazer seu download.
                 </div>
             </div>
         </div>
-    </section>
-    <script src="{% static 'js/curso.js' %}"></script>
 
-    {% endblock content %}
+        <div class="row justify-content-center">
+            <!-- Formulário de Curso -->
+            <div class="col-md-8 mb-4">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Curso</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'curso' %}" id="form-curso" autocomplete="off">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="curso" class="form-label">Selecione o Curso</label>
+                                <input list="curso_nome" id="curso" name="curso" value="{{curso}}" class="form-control" required>
+                                <datalist id="curso_nome">
+                                    <option value="Escolha Um Curso">Escolha Um Curso</option>
+                                    {% for conteudo_disciplina_json in lista %}
+                                        {% if conteudo_disciplina_json != "SS2018.1" %}
+                                            <option value="{{ conteudo_disciplina_json|title }}">
+                                                {{ conteudo_disciplina_json|title }}
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário de Conversão -->
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Disciplina</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'converter' %}" enctype="multipart/form-data" autocomplete="off">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="disc" class="form-label">Seleciona a Disciplina</label>
+                                <input list="disciplina" id="disc" name="nome-disciplina" class="form-control" required style="height: 40px; width: 100%;">
+                                <datalist id="disciplina">
+                                    <option value="Escolha Uma Disciplina">Escolha Uma Disciplina</option>
+                                    {% for conteudo_disciplina_json in l %}
+                                        <option value="{{ conteudo_disciplina_json }} {{ semestre }}">
+                                            {{ conteudo_disciplina_json }} {{ semestre }}
+                                        </option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Selecione o Arquivo</label>
+                                <input type="file" name="file" id="file" class="form-control" required>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success">Conversão de Script</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="{% url 'export_csv' %}" class="btn btn-outline-primary mt-2">Baixar CSV</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="{% static 'js/curso.js' %}"></script>
+{% endblock content %}
