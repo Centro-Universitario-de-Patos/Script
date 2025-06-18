@@ -38,7 +38,8 @@ def converter(request):
 
     semestre = data_atual()
 
-    url = "http://0.0.0.0:8001/api/v1/disciplina/oferta/"
+    # url = "http://apiv2pddhomologacao.gerenciatiunifip.opalstacked.com/api/v1/disciplina/moodle/"  # Moodle
+    url = "http://apiv2pddhomologacao.gerenciatiunifip.opalstacked.com/api/v1/disciplina/oferta/"
 
     response = requests.get(url)
 
@@ -52,6 +53,7 @@ def converter(request):
 
             nome_do_curso = informacoes_do_curso['disciplina_matriz_curricular']['matriz_curricular']['curso']['nome_curso']
             nome_da_disciplina = informacoes_do_curso['disciplina_matriz_curricular']['disciplina']['nome']
+            # matricula_da_disciplina = informacoes_do_curso['codigo']  # Moodle
             matricula_da_disciplina = informacoes_do_curso['disciplina_matriz_curricular']['disciplina']['codigo']
 
             if nome_do_curso not in lista_cursos:
@@ -220,7 +222,8 @@ def retorna_curso(request):
 
     semestre = data_atual()
 
-    url = "http://0.0.0.0:8001/api/v1/disciplina/oferta/"
+    # url = "http://apiv2pddhomologacao.gerenciatiunifip.opalstacked.com/api/v1/disciplina/moodle/"  # Moodle
+    url = "http://apiv2pddhomologacao.gerenciatiunifip.opalstacked.com/api/v1/disciplina/oferta/"
 
     response = requests.get(url)
 
@@ -234,6 +237,7 @@ def retorna_curso(request):
 
             nome_do_curso = informacoes_do_curso['disciplina_matriz_curricular']['matriz_curricular']['curso']['nome_curso']
             nome_da_disciplina = informacoes_do_curso['disciplina_matriz_curricular']['disciplina']['nome']
+            # matricula_da_disciplina = informacoes_do_curso['codigo']  # Moodle
             matricula_da_disciplina = informacoes_do_curso['disciplina_matriz_curricular']['disciplina']['codigo']
 
             if nome_do_curso not in lista_cursos:
