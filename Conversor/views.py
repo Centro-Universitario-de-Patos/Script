@@ -1,19 +1,22 @@
+import csv
+import datetime
 from ast import Try
 from asyncore import write
 from datetime import datetime
-
 from email.policy import default
-from django.shortcuts import render
+
+import requests
+from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from tablib import Dataset
+
 from .models import Moodle
 from .resources import MoodleResource
-from django.contrib import messages
-from tablib import Dataset
-from django.http import HttpResponse
-import csv
-import requests
-import datetime
+
 
 def converter(request):
+    return redirect("https://pddhomologacao.gerenciatiunifip.opalstacked.com/gerador_de_script/conversor")
     dados = {
         'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
     }
@@ -26,12 +29,12 @@ def converter(request):
 
     lista = remove_repetidos(li)
     semestre = data_atual()
-    
+
     dados = {
-        'semestre':semestre,
+        'semestre': semestre,
         'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
         'lista': lista,
-        'curso':''
+        'curso': ''
     }
     if request.method == 'POST':
         moodle = Moodle.objects.all()
@@ -44,23 +47,22 @@ def converter(request):
 
         except:
             return render(request, 'conversor/converter_erro.html', dados)
-            
+
         nome_disciplina = request.POST['nome-disciplina']
 
         if nome_disciplina == "Escolha Uma Disciplina" or nome_disciplina == 'default':
 
             return render(request, 'conversor/converter_erro.html', dados)
 
-
         if a[-3:] == "lsx":
             try:
-                imported_data = dataset.load(new_arquivo.read(), format = 'xlsx')
+                imported_data = dataset.load(new_arquivo.read(), format='xlsx')
             except:
                 return render(request, 'conversor/converter_erro.html', dados)
 
         elif a[-3:] == 'xls':
             try:
-                imported_data = dataset.load(new_arquivo.read(), format = 'xls')
+                imported_data = dataset.load(new_arquivo.read(), format='xls')
             except:
                 return render(request, 'conversor/converter_erro.html', dados)
         else:
@@ -68,14 +70,9 @@ def converter(request):
 
         # try:
         #     imported_data = dataset.load(new_arquivo.read(), format = 'xls')
-        #     api_disciplinas = retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json')        
+        #     api_disciplinas = retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json')
         # except :
         #     return render(request, 'conversor/converter_erro.html', dados)
- 
-
- 
-
-        
 
         for data in imported_data:
             nome_e_sobrenome = data[1].split(' ')
@@ -85,16 +82,16 @@ def converter(request):
             sobrenome = sobrenome.replace('[', '')
             sobrenome = sobrenome.replace(']', '')
             sobrenome = sobrenome.replace("'", '')
-            primeiro_nome = str([data[1].split(None,1)[0]])[2:-2]
-            
+            primeiro_nome = str([data[1].split(None, 1)[0]])[2:-2]
+
             value = Moodle(
-                username = data[2],
-                password = 'changeme',
-                firstname = nome,
-                lastname = sobrenome,
-                email = data[2],
-                course1 = nome_disciplina,
-                )
+                username=data[2],
+                password='changeme',
+                firstname=nome,
+                lastname=sobrenome,
+                email=data[2],
+                course1=nome_disciplina,
+            )
             tamanhoBD = len(moodle)
             if tamanhoBD == 0:
                 value.save()
@@ -102,53 +99,59 @@ def converter(request):
             else:
                 cadastrado = Moodle.objects.filter(username=data[2])
                 if cadastrado == 0:
-                    value.save() 
+                    value.save()
         return render(request, 'conversor/converter_certo.html', dados)
 
     else:
         return render(request, 'conversor/converter.html', dados)
-    
-def export_csv(request):
 
-    conteudo_disciplina_jsons = retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
+
+def export_csv(request):
+    return redirect("https://pddhomologacao.gerenciatiunifip.opalstacked.com/gerador_de_script/conversor")
+    conteudo_disciplina_jsons = retorna_api(
+        'https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
     dados = {
-        'conteudo_disciplina_jsons':conteudo_disciplina_jsons,
+        'conteudo_disciplina_jsons': conteudo_disciplina_jsons,
     }
     moodles = Moodle.objects.all()
     nome = moodles[0].course1
     nome_formatado = nome[(nome.find('-')+1):-4]
-    response = HttpResponse(content_type = 'text/csv')
+    response = HttpResponse(content_type='text/csv')
 
     data_e_hora_atuais = datetime.datetime.now()
 
-    try:        
+    try:
 
         data = str(data_e_hora_atuais.strftime('%d/%m/%Y %H:%M'))
-        
-        response['Content-Disposition'] = 'attachment; filename=' + nome_formatado +'_' + data + '.csv'
+
+        response['Content-Disposition'] = 'attachment; filename=' + \
+            nome_formatado + '_' + data + '.csv'
         writer = csv.writer(response)
-        writer.writerow(['username', 'password','firstname', 'lastname','email', 'course1'])
+        writer.writerow(['username', 'password', 'firstname',
+                        'lastname', 'email', 'course1'])
         for moodle in moodles:
             codigo = moodle.course1[0:(moodle.course1.find('-')-1)]
-            writer.writerow([moodle.username, moodle.password, moodle.firstname, moodle.lastname, moodle.email, codigo])
+            writer.writerow([moodle.username, moodle.password,
+                            moodle.firstname, moodle.lastname, moodle.email, codigo])
             moodle.delete()
         return response
     except:
         return render(request, 'conversor/converter_erro.html', dados)
-    
+
 
 def retorna_api(url):
     conteudo = requests.get(url)
     conteudo_json = conteudo.json()
     return conteudo_json
 
-def retorna_curso(request):
 
+def retorna_curso(request):
+    return redirect("https://pddhomologacao.gerenciatiunifip.opalstacked.com/gerador_de_script/conversor")
     semestre = data_atual()
     dados = {
-        
+
         'conteudo_disciplina_jsons': retorna_api('https://apidisciplinaunifip.gerenciatiunifip.opalstacked.com/disciplina/?format=json'),
-    
+
     }
 
     li = []
@@ -159,7 +162,6 @@ def retorna_curso(request):
             li.append(matriz)
 
     lista = remove_repetidos(li)
-
 
     if request.method == "POST":
 
@@ -179,10 +181,10 @@ def retorna_curso(request):
                         l.append(dis_formatada)
 
     print(l)
-    data = { 
-        'semestre':semestre,
+    data = {
+        'semestre': semestre,
         'curso': curso,
-        'l' : l,
+        'l': l,
         'lista': lista,
     }
     return render(request, 'conversor/converter.html', data)
@@ -196,6 +198,7 @@ def remove_repetidos(lista):
     l.sort()
     return l
 
+
 def data_atual():
     data = datetime.date.today()
     ano = data.strftime("%Y")
@@ -204,7 +207,5 @@ def data_atual():
         semestre = 2
     else:
         semestre = 1
-    
-    return f'{ano[2:]}.{semestre}'
 
-    
+    return f'{ano[2:]}.{semestre}'
